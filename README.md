@@ -18,6 +18,6 @@ I also plan on storing usernames + total money in a text file, which would use w
 Finally, to connect to the server and play games at a "table", I can use sockets and semaphores; this will ensure that only a set number of people can play at a time.
 
 Timeline
-Cards, card functions, and hands - 3 days (Complete by Saturday)
-Connecting to server and semaphores - 3-4 days (Complete by next Tuesday-Wednesday)
-Storing the account information and money - 1-2 days - Complete by (Thursday-Friday)
+Cards, card functions, and hands - 3 days (Complete by Saturday 1/15)
+Connecting to server and semaphores - 3-4 days (Complete by next Tuesday-Wednesday 1/18-1/19)
+Storing the account information and money - 1-2 days - Complete by (Thursday-Friday 1/20-1/21)
