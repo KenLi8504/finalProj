@@ -10,7 +10,6 @@ struct card{
   struct card *next;
 };
 
-
 struct card * makeCard(char * rank, char * suit){
   struct card *newCard = malloc (sizeof(struct card));
   strncpy(newCard -> rank,rank,10);
@@ -30,12 +29,12 @@ void swap (int *a, int *b)
 }
 
 // A utility function to print an array
-void printArray (int arr[], int n)
-{
-    for (int i = 0; i < n; i++)
-        printf("%d ", arr[i]);
-    printf("\n");
-}
+// void printArray (int arr[], int n)
+// {
+//     for (int i = 0; i < n; i++)
+//         printf("%d ", arr[i]);
+//     printf("\n");
+// }
 
 // A function to generate a random permutation of arr[]
 void randomize ( int arr[], int n )
@@ -87,22 +86,84 @@ struct card ** makeDeck(){
     int position = arr[i];
     //printf("The position is %d",position);
     struct card * cards = makeCard(ranks[position/4],suits[position%4]);
-    printCard(cards);
+    //printCard(cards);
     deck[i] = cards;
+  }
+
+  for (int i = 0; i < 51; i++){
+    deck[i] -> next = deck[i+1];
   }
   return deck;
 }
 
+struct card ** makePlayer(){
+  struct card ** hand = calloc(5,sizeof(struct card));
+  return hand;
+}
+
+struct card * drawCard(struct card * prevCard, struct card ** hand){
+  hand[sizeof(hand)/sizeof(struct card) + 1] = prevCard -> next;
+  return prevCard -> next;
+}
 
 void printHand(struct card ** hand){
-  for (int i = 0; i < sizeof(hand)/sizeof(struct card); i++){
-    printCard(hand[i]);
+  printf("Got here\n");
+  //for (int i = 0; i < 5; i++){
+    printCard(hand[0]);
+    //printf("card number %d\n",i);
+  //}
+}
+
+void printDeck(struct card ** deck){
+  for (int i = 0; i < 51; i++){
+    printCard(deck[i]);
   }
 }
 
+
 int main(){
   struct card ** deckInitial = makeDeck();
-  printHand(deckInitial);
+  printDeck(deckInitial);
+  struct card  * prevCard = deckInitial[0];
 
+  printf("The first card is:\n");
+  printCard(prevCard);
+
+  // printf("Creating players...\n");
+  //
+  struct card ** player1 = makePlayer();
+  struct card ** player2 = makePlayer();
+  //
+  // printf("Drawing cards...\n");
+  //
+  // printcard(prevCard);
+
+  printf("The 2nd card is:\n");
+  prevCard = drawCard(prevCard,player1);
+  printCard(prevCard);
+
+  printf("The 3rd card is:\n");
+  prevCard = drawCard(prevCard,player2);
+  printCard(prevCard);
+
+  printf("The 4th card is:\n");
+  prevCard = drawCard(prevCard,player2);
+  printCard(prevCard);
+
+  printf("The 5th card is:\n");
+  prevCard = drawCard(prevCard,player2);
+  printCard(prevCard);
+
+  printf("The 6th card is:\n");
+  prevCard = drawCard(prevCard,player1);
+  printCard(prevCard);
+
+  printf("The 7th card is:\n");
+  prevCard = drawCard(prevCard,player1);
+  printCard(prevCard);
+  //
+  // printf("Printing cards...\n");
+  // printHand(player1);
+  // printHand(player2);
   return 0;
 }
