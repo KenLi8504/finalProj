@@ -10,13 +10,19 @@ struct card{
   struct card *next;
 };
 
+
+//status is whether they folded or are still in play; 0 is still in play, 1 is folded
 struct hand{
   int size;
+  int money;
+  int status;
   struct card *card1;
   struct card *card2;
   struct card *card3;
   struct card *card4;
   struct card *card5;
+  struct card *card6;
+  struct card *card7;
 };
 
 struct card * makeCard(char * rank, char * suit){
@@ -85,9 +91,7 @@ struct card ** makeDeck(){
 
   for (int i = 0; i < 52; i++){
     int position = arr[i];
-    //printf("The position is %d",position);
     struct card * cards = makeCard(ranks[position/4],suits[position%4]);
-    //printCard(cards);
     deck[i] = cards;
   }
 
@@ -116,34 +120,16 @@ struct card * drawCard(struct card * prevCard, struct hand *playerhand){
   int count = playerhand->size;
    if (count == 0){
     playerhand->card1 = prevCard;
-    //printf("Went from 0 cards to 1\n");
   }
   else if (count == 1){
     playerhand->card2 = prevCard;
     playerhand->card1-> next = playerhand -> card2;
-    //printf("Went from 1 cards to 2\n");
-  }
-  else if (count == 2){
-    playerhand->card3 = prevCard;
-    playerhand->card2-> next = playerhand -> card3;
-    //printf("Went from 2 cards to 3\n");
-  }
-  else if (count == 3){
-    playerhand->card4 = prevCard;
-    playerhand->card3-> next = playerhand -> card4;
-    //printf("Went from 3 cards to 4\n");
-  }
-  else if (count == 4){
-    playerhand->card5 = prevCard;
-    playerhand->card4-> next = playerhand -> card5;
-    //printf("Went from 4 cards to 5\n");
   }
   playerhand->size = playerhand -> size + 1;
   return prevCard->next;
 }
 
 void printHand(struct hand *playerhand){
-  printf("This hand has %d cards\n",playerhand->size);
   struct card *firstCard = playerhand->card1;
   int i = 0;
   while (i < playerhand -> size){
@@ -162,50 +148,112 @@ void printDeck(struct card** deck){
   printCard(firstCard);
 }
 
+void combine(struct hand * playerhand, struct hand * shared){
+    playerhand->card3 = shared->card1;
+    playerhand->card2-> next = shared -> card1;
+
+    playerhand->card4 = shared->card2;
+    //playerhand->card3-> next = shared -> card2;
+
+    playerhand->card5 = shared->card3;
+    //playerhand->card4-> next = shared -> card3;
+
+    playerhand->card6 = shared->card4;
+    //playerhand->card5-> next = shared -> card4;
+
+    playerhand->card7 = shared->card5;
+    //playerhand->card6-> next = shared -> card5;
+  playerhand->size = 7;
+}
+
+void identifyLargest(){
+  //royal flush
+  //straight flush
+  //four of a kind
+  //full house
+  //flush
+  //straight
+  //three of a kind
+  //two pairs
+  //pair
+  //high card
+}
+
 int main(){
   struct card ** deckInitial = makeDeck();
   printDeck(deckInitial);
   struct card  * prevCard = deckInitial[0];
 
   printf("Creating players...\n");
-  //
   struct hand *player1 = makePlayer();
   struct hand *player2 = makePlayer();
-  //
+  struct hand *player3 = makePlayer();
+  struct hand *player4 = makePlayer();
+  struct hand *sharedCards = makePlayer();
+  printf("\n");
+
   printf("Drawing cards...\n");
-  //
+  for (int i = 0; i < 2; i++){
+    prevCard = drawCard(prevCard,player1);
+    prevCard = drawCard(prevCard,player2);
+    prevCard = drawCard(prevCard,player3);
+    prevCard = drawCard(prevCard,player4);
+  }
 
-  printf("The first card is..\n");
-  //
-  // printf("The next card is..\n");
-  // printCard(prevCard->next);
+  for (int i = 0; i < 5; i++){
+    prevCard = drawCard(prevCard,sharedCards);
+  }
 
-  prevCard = drawCard(prevCard,player1);
+  printf("\n");
 
-  //printHand(player1);
-  //printCard(prevCard);
-
-  prevCard = drawCard(prevCard,player2);
-  //printCard(prevCard);
-
-  prevCard = drawCard(prevCard,player2);
-  //printCard(prevCard);
-
-  prevCard = drawCard(prevCard,player2);
-  //printCard(prevCard);
-
-  prevCard = drawCard(prevCard,player1);
-  //printCard(prevCard);
-
-  prevCard = drawCard(prevCard,player1);
-  //printCard(prevCard);
-  //
   printf("Printing cards...\n");
   printf("Player 1 has %d cards\n",player1->size);
   printHand(player1);
   printf("\n");
+
   printf("Printing player 2...\n");
   printf("Player 2 has %d cards\n",player1->size);
   printHand(player2);
+  printf("\n");
+
+  printf("Printing player 3...\n");
+  printf("Player 2 has %d cards\n",player1->size);
+  printHand(player3);
+  printf("\n");
+
+  printf("Printing player 4...\n");
+  printf("Player 2 has %d cards\n",player1->size);
+  printHand(player4);
+  printf("\n");
+
+  printf("These are the shared cards\n");
+  printHand(sharedCards);
+  printf("\n");
+
+  combine(player1,sharedCards);
+  combine(player2,sharedCards);
+  combine(player3,sharedCards);
+  combine(player4,sharedCards);
+
+  printf("Final hand prints\n");
+  printf("Player 1 has %d cards\n",player1->size);
+  printHand(player1);
+  printf("\n");
+
+  printf("Printing player 2...\n");
+  printf("Player 2 has %d cards\n",player1->size);
+  printHand(player2);
+  printf("\n");
+
+  printf("Printing player 3...\n");
+  printf("Player 2 has %d cards\n",player1->size);
+  printHand(player3);
+  printf("\n");
+
+  printf("Printing player 4...\n");
+  printf("Player 2 has %d cards\n",player1->size);
+  printHand(player4);
+  printf("\n");
+
   return 0;
 }
