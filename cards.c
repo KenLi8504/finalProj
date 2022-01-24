@@ -4,15 +4,20 @@
 #include <string.h>
 #include <time.h>
 
+//Cards have rank and suit, and next points to the next card in the "linked list"
 struct card{
   char rank [10];
   char suit [10];
   struct card *next;
 };
 
-
+//size is how many cards they have
+//money is how much money they have left
+//connection is used to send specific cards to the specific people so only players can see their own hand
 //status is whether they folded or are still in play; 0 is still in play, 1 is folded
+//each of the card pointers point to the card that they have
 struct hand{
+  char * connection;
   int size;
   int money;
   int status;
@@ -25,6 +30,7 @@ struct hand{
   struct card *card7;
 };
 
+//mkaes the cards
 struct card * makeCard(char * rank, char * suit){
   struct card *newCard = malloc (sizeof(struct card));
   strncpy(newCard -> rank,rank,10);
@@ -32,24 +38,41 @@ struct card * makeCard(char * rank, char * suit){
   return newCard;
 }
 
+//prints the card that is passed
 void printCard(struct card * cardPointer){
   printf("You have a %s of %s\n",cardPointer -> rank,cardPointer -> suit);
 }
 
+//prints the entire hand
+void printHand(struct hand *playerhand){
+  struct card *firstCard = playerhand->card1;
+  int i = 0;
+  while (i < playerhand -> size){
+    printCard(firstCard);
+    firstCard = firstCard -> next;
+    i++;
+  }
+}
+
+//prints the deck (just for testing/debugging)
+void printDeck(struct card** deck){
+  struct card *firstCard = deck[0];
+  while( (firstCard -> next) != NULL){
+    printCard(firstCard);
+    firstCard = firstCard -> next;
+  }
+  printCard(firstCard);
+}
+
+
+
+//Swap and randomize was an algorithm that I searched up to shuffle a deck of cards
 void swap (int *a, int *b)
 {
     int temp = *a;
     *a = *b;
     *b = temp;
 }
-
-// A utility function to print an array
-// void printArray (int arr[], int n)
-// {
-//     for (int i = 0; i < n; i++)
-//         printf("%d ", arr[i]);
-//     printf("\n");
-// }
 
 // A function to generate a random permutation of arr[]
 void randomize ( int arr[], int n )
@@ -69,7 +92,7 @@ void randomize ( int arr[], int n )
     }
 }
 
-
+//uses randomize and swap to randomly shuffle an array of numbers, then maps these numbers to a specific card
 struct card ** makeDeck(){
   int arr[] = {0, 1, 2, 3, 4, 5, 6, 7, 8,
            9, 10, 11, 12, 13, 14, 15,
@@ -95,20 +118,14 @@ struct card ** makeDeck(){
     deck[i] = cards;
   }
 
+  //creates the linked list
   for (int i = 0; i < 51; i++){
     deck[i] -> next = deck[i+1];
   }
-
-  struct card *firstCard = deck[0];
-  while( (firstCard -> next) != NULL){
-    printCard(firstCard);
-    firstCard = firstCard -> next;
-  }
-  printCard(firstCard);
-
   return deck;
 }
 
+//creates the player
 struct hand *makePlayer(){
   struct hand *newHand = calloc(1,sizeof(struct hand));
   newHand -> size = 0;
@@ -116,6 +133,9 @@ struct hand *makePlayer(){
 }
 
 //current card is the card on the top of the deck
+//passes in a player to "draw" the current card by changing the correct card pointer
+//corresponding to the player so that their "nth" card pointer will be the current card,
+//then returns the next card in the linked list
 struct card * drawCard(struct card * prevCard, struct hand *playerhand){
   int count = playerhand->size;
    if (count == 0){
@@ -129,25 +149,7 @@ struct card * drawCard(struct card * prevCard, struct hand *playerhand){
   return prevCard->next;
 }
 
-void printHand(struct hand *playerhand){
-  struct card *firstCard = playerhand->card1;
-  int i = 0;
-  while (i < playerhand -> size){
-    printCard(firstCard);
-    firstCard = firstCard -> next;
-    i++;
-  }
-}
-
-void printDeck(struct card** deck){
-  struct card *firstCard = deck[0];
-  while( (firstCard -> next) != NULL){
-    printCard(firstCard);
-    firstCard = firstCard -> next;
-  }
-  printCard(firstCard);
-}
-
+//combines the player's hand with the 5 shared cards
 void combine(struct hand * playerhand, struct hand * shared){
     playerhand->card3 = shared->card1;
     playerhand->card2-> next = shared -> card1;
@@ -166,94 +168,95 @@ void combine(struct hand * playerhand, struct hand * shared){
   playerhand->size = 7;
 }
 
-void identifyLargest(){
+int identifyLargest(struct hand * playerhand){
+  //260-270
   //royal flush
+
+  //200-259
   //straight flush
+
+  //180-199
   //four of a kind
+
+  //160-179
   //full house
+
+  //100=159
   //flush
+
+  //80=99
   //straight
+
+
+  //60=79
   //three of a kind
+
+  //40=59
   //two pairs
+
+  //20-39
   //pair
+
+  //0=19
   //high card
 }
 
-int main(){
-  struct card ** deckInitial = makeDeck();
-  printDeck(deckInitial);
-  struct card  * prevCard = deckInitial[0];
+int checkValue(struct hand *playerhand){
+  int value = 0;
 
-  printf("Creating players...\n");
-  struct hand *player1 = makePlayer();
-  struct hand *player2 = makePlayer();
-  struct hand *player3 = makePlayer();
-  struct hand *player4 = makePlayer();
-  struct hand *sharedCards = makePlayer();
-  printf("\n");
+}
 
-  printf("Drawing cards...\n");
-  for (int i = 0; i < 2; i++){
-    prevCard = drawCard(prevCard,player1);
-    prevCard = drawCard(prevCard,player2);
-    prevCard = drawCard(prevCard,player3);
-    prevCard = drawCard(prevCard,player4);
+//Used for four of a kind, full house, pairs, three of a kind
+int checkRanks(struct hand *playerhand){
+  char * distinct[] = {"","","","","","",""};
+  int freq[] = {0,0,0,0,0,0,0};
+  int counter = 0;
+  struct card *curr = playerhand -> card1;
+  int i = 0;
+  while (i < (playerhand -> size)) {
+    printf("Looking at card %d\n",i);
+    int new = 0;
+    for (int j = 0; j < counter; j++){
+      printf("The value is %d\n",strcmp(distinct[j],(curr->rank)));
+      if (strcmp(distinct[j],(curr->rank)) == 0) {
+        new = j;
+      }
+    }
+
+    if (new == 0){
+      //printf("New Card %d was found\n",*(curr -> rank));
+      counter = counter + 1;
+      strcpy((curr -> rank),distinct[counter]);
+      freq[counter] = 1;
+    }
+
+    else{
+      freq[counter] = freq[counter] + 1;
+    }
+    curr = curr -> next;
+    i++;
+    printf("\n");
   }
-
-  for (int i = 0; i < 5; i++){
-    prevCard = drawCard(prevCard,sharedCards);
+  printf("There are %d distinct cards\n",counter);
+  for (int i = 0; i<counter; i++){
+    printf("%s\t",distinct[i]);
+    printf("%d\t",freq[i]);
+    printf("\n");
   }
-
   printf("\n");
-
-  printf("Printing cards...\n");
-  printf("Player 1 has %d cards\n",player1->size);
-  printHand(player1);
-  printf("\n");
-
-  printf("Printing player 2...\n");
-  printf("Player 2 has %d cards\n",player1->size);
-  printHand(player2);
-  printf("\n");
-
-  printf("Printing player 3...\n");
-  printf("Player 2 has %d cards\n",player1->size);
-  printHand(player3);
-  printf("\n");
-
-  printf("Printing player 4...\n");
-  printf("Player 2 has %d cards\n",player1->size);
-  printHand(player4);
-  printf("\n");
-
-  printf("These are the shared cards\n");
-  printHand(sharedCards);
-  printf("\n");
-
-  combine(player1,sharedCards);
-  combine(player2,sharedCards);
-  combine(player3,sharedCards);
-  combine(player4,sharedCards);
-
-  printf("Final hand prints\n");
-  printf("Player 1 has %d cards\n",player1->size);
-  printHand(player1);
-  printf("\n");
-
-  printf("Printing player 2...\n");
-  printf("Player 2 has %d cards\n",player1->size);
-  printHand(player2);
-  printf("\n");
-
-  printf("Printing player 3...\n");
-  printf("Player 2 has %d cards\n",player1->size);
-  printHand(player3);
-  printf("\n");
-
-  printf("Printing player 4...\n");
-  printf("Player 2 has %d cards\n",player1->size);
-  printHand(player4);
-  printf("\n");
-
   return 0;
 }
+
+// int main(){
+//   struct card ** deckInitial = makeDeck();
+//
+// printf("Creating players...\n");
+// struct hand *player1 = makePlayer();
+// struct hand *player2 = makePlayer();
+// struct hand *player3 = makePlayer();
+// struct hand *player4 = makePlayer();
+// player4 -> money = 1000;
+//
+// printf("Player 4 has %d money\n",player4 -> money);
+// return 0;
+// }
