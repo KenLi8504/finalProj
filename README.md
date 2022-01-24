@@ -21,3 +21,6 @@ Timeline
 Cards, card functions, and hands - 3 days (Complete by Saturday 1/15)
 Connecting to server and semaphores - 3-4 days (Complete by next Tuesday-Wednesday 1/18-1/19)
 Storing the account information and money - 1-2 days - Complete by (Thursday-Friday 1/20-1/21)
+
+Final Notes
+I accomplished a lot less than I wanted. Right now, all I have is a shuffle and distribute card program. You set up the server with ./server, and then you connect as many people as you want with ./client. When one of them types "start", the game starts for all of them, though they need to type some random thing to move on, and two random cards are distrubuted to each of the players.
