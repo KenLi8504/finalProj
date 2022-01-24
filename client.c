@@ -11,11 +11,24 @@ int main(int argc, char **argv) {
     server_socket = client_setup( TEST_IP );
 
   while (1) {
-    printf("enter data: ");
+    if (strcmp(buffer,"Welcome to the casino! Here are your cards.\n") != 0){
+    printf("enter command: ");
     fgets(buffer, sizeof(buffer), stdin);
     *strchr(buffer, '\n') = 0;
     write(server_socket, buffer, sizeof(buffer));
     read(server_socket, buffer, sizeof(buffer));
-    printf("received: [%s]\n", buffer);
+    printf("%s", buffer);
   }
+  else{
+    read(server_socket, buffer, sizeof(buffer));
+    while(strcmp(buffer,"You folded.") != 0){
+      read(server_socket, buffer, sizeof(buffer));
+      //printf("enter command: ");
+      //fgets(buffer, sizeof(buffer), stdin);
+      //*strchr(buffer, '\n') = 0;
+      //write(server_socket, buffer, sizeof(buffer));
+      //read(server_socket, buffer, sizeof(buffer));
+  }
+  }
+}
 }
