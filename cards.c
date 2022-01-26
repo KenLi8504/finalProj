@@ -9,6 +9,7 @@ struct card{
   char rank [10];
   char suit [10];
   struct card *next;
+  int value;
 };
 
 //size is how many cards they have
@@ -117,6 +118,12 @@ struct card ** makeDeck(){
     int position = arr[i];
     struct card * cards = makeCard(ranks[position/4],suits[position%4]);
     deck[i] = cards;
+    if (position/4 <=10){
+      cards->value = position/4;
+    }
+    else{
+      cards -> value = 10;
+    }
   }
 
   //creates the linked list

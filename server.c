@@ -144,7 +144,6 @@ while (countusernames < count){
 
   for (int i = 0; i < count; i++){
     printf("One player is %s\n",allPlayers[i]->username);
-    allPlayers[i] -> username = buffer;
   }
 
   for (int i = 0; i < count; i++){
@@ -213,7 +212,7 @@ int usernames = 0;
             printf("I got the reading back!\n");
             if (strcmp(buffer,"stay") == 0){
               printf("They decided to stay\n");
-              strcpy(buffer,"You decided to stay. You will no longer be able to make any new moves");
+              strcpy(buffer,"You decided to stay. You will no longer be able to make any new moves.\n");
               write(allPlayers[i]->connection,buffer,sizeof(buffer));
               allPlayers[i] -> status = 1;
               playersStillHitting = playersStillHitting - 1;
@@ -221,7 +220,7 @@ int usernames = 0;
             }
             else{
               printf("They decided to hit\n");
-              strcpy(buffer,"You decided to hit Here is your next card. Wait for everyone else to finish this turn before continuing.");
+              strcpy(buffer,"You decided to hit Here is your next card. Wait for everyone else to finish this turn before continuing.\n");
               write(allPlayers[i]->connection,buffer,sizeof(buffer));
               currentCard = drawCard(currentCard,allPlayers[i]);
               char * first = malloc(30);
@@ -242,6 +241,48 @@ int usernames = 0;
         }
       }
     }
+
+
+
+    int largestSum = 0;
+    int winner = 0;
+    for (int i = 0; i < count; i++){
+      int sum = 0;
+      struct card *firstCard = allPlayers[i]->card1;
+      printf("Got to here 3 with no problems\n");
+      int index = 0;
+      while (index < allPlayers[i] -> size){
+        //printCard(firstCard);
+        sum = sum + allPlayers[i]->card1->value;
+        firstCard = firstCard -> next;
+        index++;
+        printf("Got to here 4 with no problems\n");
+      }
+      if (sum > largestSum && sum < 21){
+        largestSum = sum;
+        winner = i;
+      }
+    }
+
+    for (int i = 0; i < count; i++){
+      printf("One player is %s\n",allPlayers[i]->username);
+    }
+
+    char * announce = malloc(30);
+    strcpy(announce,"The winner of this game is ");
+    //printf("%s\n",announce);
+    char * winnername = malloc (20);
+    strcpy(winnername, allPlayers[winner]->username);
+    //printf("%s\n",winnername);
+    strcat(announce,winnername);
+    //printf("%s\n",announce);
+    strcpy(buffer,announce);
+    printf("%s\n",buffer);
+
+    for (int i = 0; i < count; i++){
+      write(allPlayers[i] -> connection, buffer, sizeof(buffer));
+    }
+
     printf("Done\n");
   }
 }

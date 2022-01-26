@@ -8,6 +8,7 @@ struct card{
   char rank [10];
   char suit [10];
   struct card *next;
+  int value;
 };
 
 struct hand{
