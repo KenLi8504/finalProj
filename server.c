@@ -1,5 +1,6 @@
 #include "socket_stuff.h"
 #include "cards.h"
+#define PLAYED "list_of_played_cards.data"
 
 void process(char *s,int players);
 void startgame(fd_set clients,int count,int fd, int listen_socket, int maxfd, int servers[]);
@@ -95,6 +96,7 @@ int main() {
 }
 
 void startgame(fd_set clients,int count,int fd, int listen_socket, int maxfd, int servers []){
+  int file = open(PLAYED, O_CREAT | O_WRONLY | O_TRUNC, 0644);
   fd_set read_fds;
   char buffer[BUFFER_SIZE];
 
@@ -182,6 +184,7 @@ int usernames = 0;
       write(allPlayers[i] -> connection,first,sizeof(buffer));
       printf("%s",first);
     }
+    write(file,currentCard,sizeof(struct card));
 
     for (int i = 0; i < count; i++){
       char * first = malloc(30);
@@ -198,6 +201,7 @@ int usernames = 0;
       write(allPlayers[i] -> connection,first,sizeof(buffer));
       printf("%s",first);
     }
+    write(file,currentCard,sizeof(struct card));
 
     int playersStillHitting = count;
     while (playersStillHitting > 0){
@@ -220,7 +224,7 @@ int usernames = 0;
             }
             else{
               printf("They decided to hit\n");
-              strcpy(buffer,"You decided to hit Here is your next card. Wait for everyone else to finish this turn before continuing.\n");
+              strcpy(buffer,"You decided to hit. Here is your next card. Wait for everyone else to finish this turn before continuing.\n");
               write(allPlayers[i]->connection,buffer,sizeof(buffer));
               currentCard = drawCard(currentCard,allPlayers[i]);
               char * first = malloc(30);
@@ -236,6 +240,7 @@ int usernames = 0;
               write(allPlayers[i] -> connection,first,sizeof(buffer));
               printf("%s",first);
               playersStillOnThisTurn = playersStillOnThisTurn - 1;
+              write(file,currentCard,sizeof(struct card));
             }
           }
         }
