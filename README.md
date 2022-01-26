@@ -24,5 +24,9 @@ Storing the account information and money - 1-2 days - Complete by (Thursday-Fri
 
 Final Notes
 Update: I ended up transitioning to a sort of blackjack since organizing the different hands in texas holdem was complicated.
-Run ./server first to get everything set up, and run as many ./clients in different terminals as the number of players. After this, type "start" on any of them. There is a slight glitch where you can type anything you want for the other terminals. After typing start, you can type a username. Once everyone types in a username, each player will be given two cards. They will then take turns either hitting or staying. When all of them stay, then we can compare the hands and the first person closest to 21 wins.
+Run ./server first to get everything set up, and run as many ./clients in different terminals as the number of players. After this, type "start" on any of them. There is a slight glitch where you can type anything you want for the other terminals. After typing start, you can type a username. Once everyone types in a username, each player will be given two cards. They will then take turns either hitting or staying. When all of them stay, then we can compare the hands and the first person closest to 21 wins. As each card is drawn, they are written and stored into a txt file as well.
+
+Bugs:
+Sometimes it prints each card twice.
+There's also an issue where exiting one client terminal causes the other client terminals to infinitely print out the most recent card.
 Algorithms: I searched up an algorithm called the Fisher-Yates shuffle Algorithm to shuffle my deck. I used it to randomly shuffle an array from 0 - 51 and then mapped each of these numbers to a card.
