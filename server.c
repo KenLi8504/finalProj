@@ -147,6 +147,11 @@ while (countusernames < count){
     allPlayers[i] -> username = buffer;
   }
 
+  for (int i = 0; i < count; i++){
+    printf("One player is %s\n",allPlayers[i]->username);
+    allPlayers[i] -> status = 0;
+  }
+
 //setting in usernames
 int usernames = 0;
 
@@ -195,31 +200,48 @@ int usernames = 0;
       printf("%s",first);
     }
 
-    int playersStillIn = count;
-
-    while(playersStillIn != 1){
-      int client;
-      for (int i = 0; i < count; i++){
-        if ((allPlayers[i] -> status) == 0){
-          strcpy(buffer,"What would you like to do? Stay or hit: ");
-          write(allPlayers[i]->connection,buffer,sizeof(buffer));
-
-          while (playersStillIn > 0){
-            for (int i = 0; i < count; i++){
-              read(allPlayers[i]->connection, buffer, sizeof(buffer));
-              printf("The input was %s\n",buffer);
-              if (strcmp(buffer,"stay") == 0){
-                allPlayers[i] -> status = 1;
-                playersStillIn = playersStillIn - 1;
-              }
-              else if (strcmp(buffer,"hit") == 0){
-                currentCard = drawCard(currentCard,allPlayers[i]);
-              }
+    int playersStillHitting = count;
+    while (playersStillHitting > 0){
+      int playersStillOnThisTurn = playersStillHitting;
+      while(playersStillOnThisTurn > 0){
+        for (int i = 0; i < count; i++){
+          if (allPlayers[i] ->status == 0){
+            strcpy(buffer,"What would you like to do? \"stay\" or \"hit\": ");
+            write(allPlayers[i]->connection,buffer,sizeof(buffer));
+            printf("I sent out the writing!\n");
+            read(allPlayers[i]->connection,buffer,sizeof(buffer));
+            printf("I got the reading back!\n");
+            if (strcmp(buffer,"stay") == 0){
+              printf("They decided to stay\n");
+              strcpy(buffer,"You decided to stay. You will no longer be able to make any new moves");
+              write(allPlayers[i]->connection,buffer,sizeof(buffer));
+              allPlayers[i] -> status = 1;
+              playersStillHitting = playersStillHitting - 1;
+              playersStillOnThisTurn = playersStillOnThisTurn - 1;
+            }
+            else{
+              printf("They decided to hit\n");
+              strcpy(buffer,"You decided to hit Here is your next card. Wait for everyone else to finish this turn before continuing.");
+              write(allPlayers[i]->connection,buffer,sizeof(buffer));
+              currentCard = drawCard(currentCard,allPlayers[i]);
+              char * first = malloc(30);
+              char * second = malloc(10);
+              strcpy(first,"You have a ");
+              strcpy(second," of ");
+              strcpy(suit,currentCard->suit);
+              strcpy(rank,currentCard->rank);
+              strcat(first,rank);
+              strcat(first,second);
+              strcat(first,suit);
+              strcat(first,"\n");
+              write(allPlayers[i] -> connection,first,sizeof(buffer));
+              printf("%s",first);
+              playersStillOnThisTurn = playersStillOnThisTurn - 1;
             }
           }
-
         }
       }
     }
+    printf("Done\n");
   }
 }
