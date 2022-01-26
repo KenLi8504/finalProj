@@ -23,4 +23,6 @@ Connecting to server and semaphores - 3-4 days (Complete by next Tuesday-Wednesd
 Storing the account information and money - 1-2 days - Complete by (Thursday-Friday 1/20-1/21)
 
 Final Notes
-I accomplished a lot less than I wanted. Right now, all I have is a shuffle and distribute card program. You set up the server with ./server, and then you connect as many people as you want with ./client. When one of them types "start", the game starts for all of them, though they need to type some random thing to move on, and two random cards are distrubuted to each of the players.
+Update: I ended up transitioning to a sort of blackjack since organizing the different hands in texas holdem was complicated.
+Run ./server first to get everything set up, and run as many ./clients in different terminals as the number of players. After this, type "start" on any of them. There is a slight glitch where you can type anything you want for the other terminals. After typing start, you can type a username. Once everyone types in a username, each player will be given two cards. They will then take turns either hitting or staying. When all of them stay, then we can compare the hands and the first person closest to 21 wins.
+Algorithms: I searched up an algorithm called the Fisher-Yates shuffle Algorithm to shuffle my deck. I used it to randomly shuffle an array from 0 - 51 and then mapped each of these numbers to a card.
