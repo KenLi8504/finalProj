@@ -17,10 +17,11 @@ struct card{
 //status is whether they folded or are still in play; 0 is still in play, 1 is folded
 //each of the card pointers point to the card that they have
 struct hand{
-  char * connection;
+  int connection;
   int size;
   int money;
   int status;
+  char * username;
   struct card *card1;
   struct card *card2;
   struct card *card3;
@@ -167,96 +168,3 @@ void combine(struct hand * playerhand, struct hand * shared){
     //playerhand->card6-> next = shared -> card5;
   playerhand->size = 7;
 }
-
-int identifyLargest(struct hand * playerhand){
-  //260-270
-  //royal flush
-
-  //200-259
-  //straight flush
-
-  //180-199
-  //four of a kind
-
-  //160-179
-  //full house
-
-  //100=159
-  //flush
-
-  //80=99
-  //straight
-
-
-  //60=79
-  //three of a kind
-
-  //40=59
-  //two pairs
-
-  //20-39
-  //pair
-
-  //0=19
-  //high card
-}
-
-int checkValue(struct hand *playerhand){
-  int value = 0;
-
-}
-
-//Used for four of a kind, full house, pairs, three of a kind
-int checkRanks(struct hand *playerhand){
-  char * distinct[] = {"","","","","","",""};
-  int freq[] = {0,0,0,0,0,0,0};
-  int counter = 0;
-  struct card *curr = playerhand -> card1;
-  int i = 0;
-  while (i < (playerhand -> size)) {
-    printf("Looking at card %d\n",i);
-    int new = 0;
-    for (int j = 0; j < counter; j++){
-      printf("The value is %d\n",strcmp(distinct[j],(curr->rank)));
-      if (strcmp(distinct[j],(curr->rank)) == 0) {
-        new = j;
-      }
-    }
-
-    if (new == 0){
-      //printf("New Card %d was found\n",*(curr -> rank));
-      counter = counter + 1;
-      strcpy((curr -> rank),distinct[counter]);
-      freq[counter] = 1;
-    }
-
-    else{
-      freq[counter] = freq[counter] + 1;
-    }
-    curr = curr -> next;
-    i++;
-    printf("\n");
-  }
-  printf("There are %d distinct cards\n",counter);
-  for (int i = 0; i<counter; i++){
-    printf("%s\t",distinct[i]);
-    printf("%d\t",freq[i]);
-    printf("\n");
-  }
-  printf("\n");
-  return 0;
-}
-
-// int main(){
-//   struct card ** deckInitial = makeDeck();
-//
-// printf("Creating players...\n");
-// struct hand *player1 = makePlayer();
-// struct hand *player2 = makePlayer();
-// struct hand *player3 = makePlayer();
-// struct hand *player4 = makePlayer();
-// player4 -> money = 1000;
-//
-// printf("Player 4 has %d money\n",player4 -> money);
-// return 0;
-// }

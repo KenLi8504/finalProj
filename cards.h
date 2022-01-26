@@ -11,10 +11,11 @@ struct card{
 };
 
 struct hand{
-  char * connection;
+  int connection;
   int size;
   int money;
   int status;
+  char * username;
   struct card *card1;
   struct card *card2;
   struct card *card3;
@@ -34,7 +35,8 @@ void randomize ( int arr[], int n );
 struct card ** makeDeck();
 
 struct hand *makePlayer();
+void printDeck(struct card** deck);
 
-struct card * drawCard(struct card * prevCard, struct card ** hand);
+struct card * drawCard(struct card * prevCard, struct hand * hand);
 
 void printHand(struct card ** hand);

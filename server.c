@@ -19,7 +19,6 @@ int main() {
   //make sure clients is totally empty
   FD_ZERO( &clients );
   listen_socket = server_setup();
-  printf("listen socket: %d\n", listen_socket);
   //add the listening socket to the master set
   FD_SET(listen_socket, &clients);
   //we have to keep track of the largest file descriptor for select
@@ -28,6 +27,7 @@ int main() {
   while (1) {
     //must reset read_fds after each time you process select
     read_fds = clients;
+
     /*
       magic time!
       the first argument is 1 more than the largest file descriptor
@@ -62,15 +62,22 @@ int main() {
           //if tead returns 0 bytes, then we should close the
           //connection, otherwise process it.
           if (read(fd, buffer, sizeof(buffer)) ) {
+
             if (strcmp(buffer,"start") == 0){
               printf("starting game...\n");
               strcpy(buffer,"The game is now starting...\n");
-              write(fd, buffer, sizeof(buffer));
+              // for (fd = 0 ; fd <= maxfd; fd++){
+              //   if (FD_ISSET(fd, &read_fds) && fd != listen_socket){
+              //     write(fd, buffer, sizeof(buffer));
+              //   }
+              // }
               startgame(clients,countPlayers,fd,listen_socket,maxfd,servers);
             }
             else{
+              printf("Refusal\n");
               strcpy(buffer,"Type \"start\" to start this game.\n");
               write(fd, buffer, sizeof(buffer));
+              printf("Refusal sent\n");
             }
           }//data to be read
           else {
@@ -91,13 +98,6 @@ void startgame(fd_set clients,int count,int fd, int listen_socket, int maxfd, in
   fd_set read_fds;
   char buffer[BUFFER_SIZE];
 
-  for (fd=0; fd<=maxfd; fd++){
-    if FD_ISSET(fd, &read_fds){
-    strcpy(buffer,"Welcome to the casino! A game is beginning now...\n");
-    write(fd, buffer, sizeof(buffer));
-  }
-}
-
   struct hand *allPlayers[count];
   for (int i = 0; i < count; i++){
     struct hand *newPlayer = makePlayer();
@@ -109,6 +109,48 @@ void startgame(fd_set clients,int count,int fd, int listen_socket, int maxfd, in
   for (int i = 0; i < count; i++){
     allPlayers[i] -> connection = servers[i];
   }
+
+  for (int i = 0; i < count; i++){
+    strcpy(buffer,"The game is now starting...\n");
+    //strcpy(buffer,"Welcome to the casino! A game is beginning now...\n");
+    write(allPlayers[i]->connection,buffer,sizeof(buffer));
+  }
+
+  for (int i = 0; i < count; i++){
+    if (allPlayers[i] -> connection != fd){
+    read(allPlayers[i]->connection,buffer,sizeof(buffer));
+  }
+  }
+
+/////////////////////////////
+int countusernames = 0;
+while (countusernames < count){
+  for (int i = 0; i < count; i++){
+    read(allPlayers[i]->connection,buffer,sizeof(buffer));
+    printf("The buffer is %s\n",buffer);
+    char * temp = malloc(20);
+    printf("Got up here\n");
+    strcpy(temp,buffer);
+    printf("Got up here\n");
+    allPlayers[i] -> username = temp;
+    printf("Got up here\n");
+    strcpy(buffer,"Your username was submitted! Waiting on other players to submit their usernames...\n");
+    write(allPlayers[i]->connection,buffer,sizeof(buffer));
+    countusernames = countusernames + 1;
+    printf("%d out of %d players here\n",countusernames,count);
+  }
+}
+/////////////////////////////
+
+  for (int i = 0; i < count; i++){
+    printf("One player is %s\n",allPlayers[i]->username);
+    allPlayers[i] -> username = buffer;
+  }
+
+//setting in usernames
+int usernames = 0;
+
+
   strcpy(buffer,"Round start! Here are your cards.\n");
   for (int i = 0; i < count; i++){
     write(allPlayers[i] -> connection, buffer, sizeof(buffer));
@@ -120,8 +162,6 @@ void startgame(fd_set clients,int count,int fd, int listen_socket, int maxfd, in
 
     char * suit = malloc(10);
     char * rank = malloc (10);
-    //printf("The suit of the card at the top is %s\n",currentCard->suit);
-    //printf("The rank of the card at the top is %s\n",currentCard->rank);
 
     for (int i = 0; i < count; i++){
       char * first = malloc(30);
@@ -129,134 +169,57 @@ void startgame(fd_set clients,int count,int fd, int listen_socket, int maxfd, in
       strcpy(first,"You have a ");
       strcpy(second," of ");
       currentCard = drawCard(currentCard,allPlayers[i]);
-      //printf("No problems2!\n");
       strcpy(suit,currentCard->suit);
-      //printf("No problems3!\n");
       strcpy(rank,currentCard->rank);
-      //printf("No problems4!\n");
       strcat(first,rank);
-      //printf("No problems5!\n");
       strcat(first,second);
-      //printf("No problems6!\n");
-      strcat(first,suit);
-      strcat(first,"\n");
-      write(allPlayers[i] -> connection,first,sizeof(buffer));
-      printf("%s",first);
-    }
-    for (int i = 0; i < count; i++){
-      char * first = malloc(30);
-      char * second = malloc(10);
-      strcpy(first,"You have a ");
-      strcpy(second," of ");
-      currentCard = drawCard(currentCard,allPlayers[i]);
-      //printf("No problems2!\n");
-      strcpy(suit,currentCard->suit);
-      //printf("No problems3!\n");
-      strcpy(rank,currentCard->rank);
-      //printf("No problems4!\n");
-      strcat(first,rank);
-      //printf("No problems5!\n");
-      strcat(first,second);
-      //printf("No problems6!\n");
       strcat(first,suit);
       strcat(first,"\n");
       write(allPlayers[i] -> connection,first,sizeof(buffer));
       printf("%s",first);
     }
 
-    read(allPlayers[0]->connection,buffer,sizeof(buffer));
+    for (int i = 0; i < count; i++){
+      char * first = malloc(30);
+      char * second = malloc(10);
+      strcpy(first,"You have a ");
+      strcpy(second," of ");
+      currentCard = drawCard(currentCard,allPlayers[i]);
+      strcpy(suit,currentCard->suit);
+      strcpy(rank,currentCard->rank);
+      strcat(first,rank);
+      strcat(first,second);
+      strcat(first,suit);
+      strcat(first,"\n");
+      write(allPlayers[i] -> connection,first,sizeof(buffer));
+      printf("%s",first);
+    }
+
+    int playersStillIn = count;
+
+    while(playersStillIn != 1){
+      int client;
+      for (int i = 0; i < count; i++){
+        if ((allPlayers[i] -> status) == 0){
+          strcpy(buffer,"What would you like to do? Stay or hit: ");
+          write(allPlayers[i]->connection,buffer,sizeof(buffer));
+
+          while (playersStillIn > 0){
+            for (int i = 0; i < count; i++){
+              read(allPlayers[i]->connection, buffer, sizeof(buffer));
+              printf("The input was %s\n",buffer);
+              if (strcmp(buffer,"stay") == 0){
+                allPlayers[i] -> status = 1;
+                playersStillIn = playersStillIn - 1;
+              }
+              else if (strcmp(buffer,"hit") == 0){
+                currentCard = drawCard(currentCard,allPlayers[i]);
+              }
+            }
+          }
+
+        }
+      }
+    }
   }
 }
-  //
-  //     // currentCard = drawCard(currentCard,allPlayers[i]);
-  //     // //printf("No problems2!\n");
-  //     // strcpy(suit,currentCard->suit);
-  //     // //printf("No problems3!\n");
-  //     // strcpy(rank,currentCard->rank);
-  //     // //printf("No problems4!\n");
-  //     // strcat(first,rank);
-  //     // //printf("No problems5!\n");
-  //     // strcat(second,first);
-  //     // //printf("No problems6!\n");
-  //     // strcat(second,suit);
-  //     // printf("Done with second run!\n");
-  //     // write(allPlayers[i] -> connection,second,30);
-  //     // printf("Epic\n");
-  //     // free(first);
-  //     // free(second);
-  //   }
-  //
-  //   for (int i = 0; i < count; i++){
-  //     char * first = malloc(30);
-  //     char * second = malloc(10);
-  //
-  //     strcpy(first,"You have a ");
-  //     strcpy(second," of ");
-  //     currentCard = drawCard(currentCard,allPlayers[i]);
-  //
-  //     //printf("No problems2!\n");
-  //     strcpy(suit,currentCard->suit);
-  //     //printf("No problems3!\n");
-  //     strcpy(rank,currentCard->rank);
-  //     //printf("No problems4!\n");
-  //
-  //     strcat(first,rank);
-  //     //printf("No problems5!\n");
-  //     strcat(first,second);
-  //     //printf("No problems6!\n");
-  //     strcat(first,suit);
-  //     strcat(first,"\n");
-  //     printf("%s",first);
-  //     write(allPlayers[i] -> connection,first,30);
-  //   }
-  // }
-  // }
-  // }
-  // }
-
-//     printf("Still no problems\n");
-//
-//     read_fds = clients;
-//     int activePlayers = count;
-//     int client;
-//     printf("Still no problems2\n");
-//     while(activePlayers > 2){
-//       printf("Still no problems3\n");
-//       int i = select(maxfd + 1, &read_fds, NULL, NULL, NULL);
-//       error_check_sock(i, "select", listen_socket);
-//       //printf("select ready: %d\n", i);
-//       //all we know is a file descriptor is ready, we don't know which one
-//       //loop through read_fds for any available socket
-//       for (fd=0; fd<=maxfd; fd++) {
-//         //will return true if the provided file descriptor is in read_fds
-//             //if the socket got closed, select will trigger
-//             //if tead returns 0 bytes, then we should close the
-//             //connection, otherwise process it.
-//             if (read(fd, buffer, sizeof(buffer)) ) {
-//               if (strcmp(buffer,"fold") == 0){
-//                 strcpy(buffer,"You folded.");
-//                 write(fd, buffer, sizeof(buffer));
-//                 activePlayers = activePlayers - 1;
-//               }
-//               else if (strcmp(buffer,"raise")){
-//                 strcpy(buffer,"How much would you like to raise?");
-//                 write(fd,buffer,sizeof(buffer));
-//               }
-//               else{
-//                 strcpy(buffer,"Type \"start\" to start this game.\n");
-//                 write(fd, buffer, sizeof(buffer));
-//               }
-//             }//data to be read
-//             else {
-//               //remove this descriptor from the full set
-//               FD_CLR(fd, &clients);
-//               close(fd);
-//             }//close the connection
-//           }//existing socket
-//         }//descriptor is readhy
-//       }//loop through sockets
-//   }
-// }
-//   for (int i = 0; i < count; i++){
-//     //free(allPlayers[i]);
-//   }
