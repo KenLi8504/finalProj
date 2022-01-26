@@ -7,5 +7,14 @@ Finished the card functions except for comparing different hands
 January 20,2022 - Ken Li
 Worked on an approach for comboes
 
-January 21-24, 2022 - Ken Li
+January 21-23, 2022 - Ken Li
 Worked with sockets to create the multiple clients needed to connect to the server
+
+January 24, 2022 - Ken Li
+Made a few changes necesssary for blackjack, since it is simpler but functionally uses the same components as texas holdem.
+
+January 25, 2022 - Ken Li
+Completed the sockets aspect; can now successfully sign in with different usernames and have said usernames printed out as winners.
+
+January 26, 2022 - Ken Li
+Worked on an aspect that would print all of the played cards to a file to better help the player understand what cards may still be in play.
